@@ -1,4 +1,5 @@
 ﻿using IdentityService.Models;
+using IdentityService.Models.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +10,9 @@ namespace IdentityService.Controllers
     public class AuthController : ControllerBase
     {
         [HttpPost("register")]
-        public IActionResult Register([FromBody] ApplicationUser user)
+        public IActionResult Register([FromBody]RegistrationRequestDto RegisterUserRequest)
         {
-            if (user == null)
+            if (RegisterUserRequest == null)
             {
                 return BadRequest("User data is required.");
             }
@@ -20,7 +21,7 @@ namespace IdentityService.Controllers
             return Ok("User registered successfully.");
         }
         [HttpPost("login")]
-        public IActionResult Login([FromBody] ApplicationUser user)
+        public IActionResult Login([FromBody]ApplicationUser user)
         {
             if (user == null)
             {
