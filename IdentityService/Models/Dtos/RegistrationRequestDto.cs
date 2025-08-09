@@ -4,16 +4,10 @@ namespace IdentityService.Models.Dtos
 {
     public class RegistrationRequestDto
     {
-        [Display(Name = "Name")]
-        public string? UserName { get; set; }
-
-        [Display(Name = "Email")]
-        public string? UserEmail { get; set; }
-
-        [Display(Name = "Phone Number")]
-        public string? UserPhoneNumber { get; set; }
-        public string? password { get; set; }
-        public string? UserRole  { get; set; }
-        public int ShopId { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Role { get; set; } // "Vendor" or "BusinessUser"
+        public int? WarehouseID { get; set; } // required for BusinessUser
     }
 }

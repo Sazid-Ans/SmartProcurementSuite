@@ -1,35 +1,58 @@
-﻿using IdentityService.Models;
+﻿using IdentityService.DomainService;
+using IdentityService.Models;
 using IdentityService.Models.Dtos;
+using IdentityService.Service;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[Action]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        [HttpPost("register")]
-        public IActionResult Register([FromBody]RegistrationRequestDto RegisterUserRequest)
+        public readonly IAuthService _authService;
+        
+        private readonly IConfiguration _config;
+      
+
+
+        public AuthController(IAuthService authService, IConfiguration config)
         {
-            if (RegisterUserRequest == null)
-            {
-                return BadRequest("User data is required.");
-            }
-            // Here you would typically add logic to save the user to the database
-            // and handle any errors that may occur.
+            _authService = authService;
+            _config = config;
+        }
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegistrationRequestDto dto)
+        {
+            if (dto == null)
+                return BadRequest("Invalid request");
+
+            var result = await _authService.RegisterUserAsync(dto);
+            if (!result.Succeeded)
+                return BadRequest(result.ErrorMessage);
+
             return Ok("User registered successfully.");
         }
+
         [HttpPost("login")]
-        public IActionResult Login([FromBody]ApplicationUser user)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto user)
         {
             if (user == null)
-            {
                 return BadRequest("User data is required.");
-            }
+
             // Here you would typically add logic to authenticate the user
             // and return a JWT token if successful.
-            return Ok("User logged in successfully.");
+            var result = await _authService.LoginUserAsync(user);
+
+            if (!result.Succeeded) return Unauthorized(result.ErrorMessage);
+
+            return Ok(new
+            {
+                Token = result.Jwt,
+                ExpiresIn = result.ExpiresInMinutes
+            });
         }
     }
 }
